@@ -1,21 +1,51 @@
 import { trace } from "@opentelemetry/api";
 import pino from "pino";
 import { closeEvents, declaredSubscriptions, subscribe } from "./events.js";
+import { service } from "./platform.js";
 
-// A background worker: no web address. It does one unit of work every WORK_INTERVAL_MS
-// (default a minute); replace work() with the app's job. The platform restarts it if it exits.
+// A background worker: no web address. Every WORK_INTERVAL_MS (default half a minute) it buys
+// something from demo-shop and looks at the shop, as a person would. That keeps a little traffic
+// flowing through the demo apps (demo-shop, demo-orders, the created event, demo-notifier), so
+// their dashboards, traces and logs always have something to show.
 const logger = pino({
   level: process.env.LOG_LEVEL ?? "info",
 });
 
 const serviceName = process.env.OTEL_SERVICE_NAME ?? "swhurl-app";
-const intervalMs = Number.parseInt(process.env.WORK_INTERVAL_MS ?? "60000", 10);
+const intervalMs = Number.parseInt(process.env.WORK_INTERVAL_MS ?? "30000", 10);
+const ITEMS = ["tea", "coffee", "biscuits", "milk", "sugar"];
+const pick = <T>(choices: T[]): T => choices[Math.floor(Math.random() * choices.length)] as T;
+
+// One visit to the shop: buy one to three of something, then look at the latest orders. demo-shop
+// is called as another app would call it: this app declared the call (calls: [demo-shop]), so the
+// platform gives it the shop's address and a token only the shop accepts. Quantities stay small on
+// purpose: demo-notifier tells the team about an order of ten or more, and this must not.
+export async function visitShop(): Promise<{ bought: string | null; status: number }> {
+  const shop = service("demo-shop");
+  const item = pick(ITEMS);
+  const quantity = 1 + Math.floor(Math.random() * 3);
+  const bought = await shop.fetch("/buy", {
+    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ item, quantity }),
+  });
+  await bought.arrayBuffer();
+  const looked = await shop.fetch("/");
+  await looked.arrayBuffer();
+  return { bought: bought.ok ? `${quantity} ${item}` : null, status: bought.status };
+}
 const tracer = trace.getTracer(serviceName);
 
 async function work(): Promise<void> {
   await tracer.startActiveSpan("work", async (span) => {
     try {
-      logger.info({ trace_id: span.spanContext().traceId }, "work done");
+      // A visit that fails (the shop is away, the call is not declared yet) is logged and tried
+      // again next time: the worker keeps going.
+      try {
+        const visit = await visitShop();
+        logger.info({ bought: visit.bought, status: visit.status, trace_id: span.spanContext().traceId }, "work done");
+      } catch (error) {
+        logger.warn({ err: error, trace_id: span.spanContext().traceId }, "the shop could not be visited");
+        logger.info({ bought: null, trace_id: span.spanContext().traceId }, "work done");
+      }
     } catch (error) {
       logger.error({ err: error }, "work failed");
       span.recordException(error as Error);

@@ -1,5 +1,11 @@
 # demo-shopper
 
+> **A demo app of the swhurl platform.** With [demo-shop](https://github.com/samclement/demo-shop), [demo-orders](https://github.com/samclement/demo-orders) and [demo-notifier](https://github.com/samclement/demo-notifier) it shows how apps on the platform work together. This one shows:
+>
+> - **A worker.** No web address: `src/worker.ts` works every half minute (`WORK_INTERVAL_MS`).
+> - **One app calling another as itself.** `swhurl.yaml` says `calls: [demo-shop]`; each visit buys one to three of something from demo-shop and looks at the shop, and demo-shop sees the caller as the app `demo-shopper`.
+> - **Light, steady traffic.** About four requests a minute through demo-shop and demo-orders, and two events, so the demo apps' dashboards, traces and logs always have something to show. To pause it, scale the app to zero replicas on the platform.
+
 Demo: a worker that buys something from demo-shop every half minute, so there is always some traffic
 
 A TypeScript app on the [swhurl platform](https://github.com/samclement/swhurl-platform), made from the [swhurl TypeScript template](https://github.com/samclement/swhurl-app-template-typescript). Every push to `main` is checked, published to `ghcr.io/<owner>/demo-shopper` and deployed to staging; production changes through **Promote to production**. What the image must provide, the checks and the dependency updates: the [template's guide](https://github.com/samclement/swhurl-app-template-typescript#readme). What the app needs from the platform: [`swhurl.yaml`](swhurl.yaml).
