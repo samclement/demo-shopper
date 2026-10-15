@@ -6,5 +6,3 @@ kind: worker
 uid: 65532
 telemetry: otlp
 autoDeploy: true
-# The apps this one calls: the platform gives it their address and a token only they accept.
-calls: [demo-shop]

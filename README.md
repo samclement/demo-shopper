@@ -3,7 +3,7 @@
 > **A demo app of the swhurl platform.** With [demo-shop](https://github.com/samclement/demo-shop), [demo-orders](https://github.com/samclement/demo-orders) and [demo-notifier](https://github.com/samclement/demo-notifier) it shows how apps on the platform work together. This one shows:
 >
 > - **A worker.** No web address: `src/worker.ts` works every half minute (`WORK_INTERVAL_MS`).
-> - **One app calling another as itself.** `swhurl.yaml` says `calls: [demo-shop]`; each visit buys one to three of something from demo-shop and looks at the shop, and demo-shop sees the caller as the app `demo-shopper`.
+> - **One app calling another as itself.** The platform grants it a call to demo-shop (`make app-calls`; nothing about it is in `swhurl.yaml`); each visit buys one to three of something from demo-shop and looks at the shop, and demo-shop sees the caller as the app `demo-shopper`.
 > - **Light, steady traffic.** About four requests a minute through demo-shop and demo-orders, and two events, so the demo apps' dashboards, traces and logs always have something to show. To pause it, scale the app to zero replicas on the platform.
 
 Demo: a worker that buys something from demo-shop every half minute, so there is always some traffic
