@@ -9,31 +9,4 @@ info:
   title: demo-shopper
   version: 0.1.0
   description: "Demo: a worker that buys something from demo-shop every half minute, so there is always some traffic"
-channels:
-  worked:
-    address: worked
-    description: demo-shopper finished one unit of work.
-    messages:
-      worked:
-        $ref: '#/components/messages/worked'
-operations:
-  publishWorked:
-    action: send
-    channel:
-      $ref: '#/channels/worked'
-components:
-  messages:
-    worked:
-      summary: One finished unit of work
-      payload:
-        type: object
-        required: [at]
-        additionalProperties: false
-        properties:
-          at:
-            type: string
-            format: date-time
-            description: When the work finished
-      examples:
-        - payload:
-            at: '2026-01-01T00:00:00.000Z'
+channels: {}

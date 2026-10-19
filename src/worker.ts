@@ -1,12 +1,8 @@
 import { trace } from "@opentelemetry/api";
 import pino from "pino";
-<<<<<<< before updating
 import { closeEvents, declaredSubscriptions, subscribe } from "./events.js";
+import { watchFlags } from "./flags.js";
 import { service } from "./platform.js";
-=======
-import { closeEvents, declaredSubscriptions, publish, subscribe } from "./events.js";
-import { flags, watchFlags } from "./flags.js";
->>>>>>> after updating
 
 // A background worker: no web address. Every WORK_INTERVAL_MS (default half a minute) it buys
 // something from demo-shop and looks at the shop, as a person would. That keeps a little traffic
@@ -42,7 +38,6 @@ const tracer = trace.getTracer(serviceName);
 async function work(): Promise<void> {
   await tracer.startActiveSpan("work", async (span) => {
     try {
-<<<<<<< before updating
       // A visit that fails (the shop is away, the call is not declared yet) is logged and tried
       // again next time: the worker keeps going.
       try {
@@ -52,13 +47,6 @@ async function work(): Promise<void> {
         logger.warn({ err: error, trace_id: span.spanContext().traceId }, "the shop could not be visited");
         logger.info({ bought: null, trace_id: span.spanContext().traceId }, "work done");
       }
-=======
-      // An example of publishing: "worked" is described in asyncapi.yaml, which is what lets other
-      // apps find it and subscribe. Off the platform the payload is still checked, and nothing is sent.
-      await publish("worked", { at: new Date().toISOString() });
-      // An example of a feature flag: shout is declared in swhurl.yaml, on in staging only.
-      logger.info({ trace_id: span.spanContext().traceId }, flags.shout ? "WORK DONE" : "work done");
->>>>>>> after updating
     } catch (error) {
       logger.error({ err: error }, "work failed");
       span.recordException(error as Error);

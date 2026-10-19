@@ -42,7 +42,7 @@ flags:
   new-checkout: {type: boolean, description: Use the new checkout flow, default: false, staging: true}
 ```
 
-Every build, type-check, test and `npm run dev` first runs `scripts/flags.mjs`, which checks the declarations and writes `src/flags.ts` (ignored by Git): `import { flags } from "./flags.js"`, then `if (flags.newCheckout)`. On the platform an override set from the console wins: the app watches its own overrides over NATS (`src/flagstore.ts`) and the next read returns the new value, without a restart. Otherwise a flag is the value declared for `SWHURL_ENV`, else its default, which is also what local development gets. A restart keeps the override; `/healthz` reports not ready until the stored overrides arrive (at most 5 s). Types: `boolean`, `integer`, `number` (with optional `min` and `max`) and `string` (with an optional `enum`). To remove a flag, delete it from `swhurl.yaml`: `npm run check` then names each place that still reads it. `shout`, read in `src/worker.ts`, is an example to replace.
+Every build, type-check, test and `npm run dev` first runs `scripts/flags.mjs`, which checks the declarations and writes `src/flags.ts` (ignored by Git): `import { flags } from "./flags.js"`, then `if (flags.newCheckout)`. On the platform an override set from the console wins: the app watches its own overrides over NATS (`src/flagstore.ts`) and the next read returns the new value, without a restart. Otherwise a flag is the value declared for `SWHURL_ENV`, else its default, which is also what local development gets. A restart keeps the override; `/healthz` reports not ready until the stored overrides arrive (at most 5 s). Types: `boolean`, `integer`, `number` (with optional `min` and `max`) and `string` (with an optional `enum`). To remove a flag, delete it from `swhurl.yaml`: `npm run check` then names each place that still reads it.
 
 ## Events
 
@@ -55,7 +55,7 @@ events:
 
 What it receives is a grant, set on the platform: tick `orders.created` under **Connections** when creating the app, or later use the app page's **Connect to an app** or `make app-events ARGS="--add-subscribe orders.created"`.
 
-Then `await publish("created", data)` and `await subscribe("orders.created", async (event) => { ... })`. An event is a CloudEvents envelope (`event.data` is what was published); a handler runs inside the publisher's trace, and if it throws the event comes back, five tries in all. `src/worker.ts` publishes `worked` after every run and logs every event it subscribes to: examples to replace. `subscribe` keeps trying until it is receiving, since a new app can start before NATS knows it. Locally there is no NATS: `publish` returns `null` and `subscribe` never calls back.
+Then `await publish("created", data)` and `await subscribe("orders.created", async (event) => { ... })`. An event is a CloudEvents envelope (`event.data` is what was published); a handler runs inside the publisher's trace, and if it throws the event comes back, five tries in all. demo-shopper publishes nothing: its `asyncapi.yaml` has no channels. `subscribe` keeps trying until it is receiving, since a new app can start before NATS knows it. Locally there is no NATS: `publish` returns `null` and `subscribe` never calls back.
 
 ### The events this app offers: `asyncapi.yaml`
 
