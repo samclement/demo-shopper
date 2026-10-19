@@ -1,8 +1,29 @@
-# What this app needs from the swhurl platform. Read by the platform's `make app-new --from-repo`;
-# fields: https://github.com/samclement/swhurl-platform/blob/main/docs/apps.md#swhurlyaml
+# This app's identity, what its image needs and what it offers, read by the swhurl platform.
+# Each field and its kind: https://github.com/samclement/swhurl-platform/blob/main/docs/apps.md#swhurlyaml
+
+# Identity: what the app is
 version: 1
 stack: typescript
 kind: worker
+# One line saying what the app does: the platform passes it to the app as SWHURL_DESCRIPTION
+description: "Demo: a worker that buys something from demo-shop every half minute, so there is always some traffic"
+
+# Needs: what the image needs to run
 uid: 65532
 telemetry: otlp
-autoDeploy: true
+
+# Offers: what other apps can use
+# Its events: the platform reads asyncapi.yaml for every image; it says what the app publishes.
+provides:
+  eventsFile: asyncapi.yaml
+# Feature flags: typed, with a value per environment; the build generates src/flags.ts from them.
+# https://github.com/samclement/swhurl-platform/blob/main/docs/apps.md#feature-flags
+flags:
+  shout:
+    type: boolean
+    description: Say hello in capitals
+    default: false
+    staging: true
+
+# Grants are set on the platform, not here: the team, who can reach the app, the apps it calls, the
+# events it receives and its alerts (the console's New app form and app page, or make app-*).
