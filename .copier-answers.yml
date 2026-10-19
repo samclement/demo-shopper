@@ -1,10 +1,10 @@
 # Written by Copier from samclement/swhurl-app-template-typescript; `copier update` reads it. Do not edit.
-_commit: v0.2.5
+_commit: v0.2.18
 _src_path: https://github.com/samclement/swhurl-app-template-typescript.git
 api: none
 app_name: demo-shopper
 database: none
 description: 'Demo: a worker that buys something from demo-shop every half minute,
     so there is always some traffic'
-events: none
+frontend: none
 kind: worker

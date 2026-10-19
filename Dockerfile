@@ -5,7 +5,8 @@ ARG NPM_CONFIG_LOGLEVEL=warn
 RUN npm ci
 
 FROM deps AS build
-COPY tsconfig.json ./
+COPY tsconfig.json swhurl.yaml ./
+COPY scripts ./scripts
 COPY src ./src
 RUN npm run build
 
@@ -38,4 +39,5 @@ COPY --from=prod-deps --chown=65532:65532 /app/node_modules ./node_modules
 COPY --from=prod-deps --chown=65532:65532 /app/package.json ./package.json
 # Depending on the check stage makes a failing test stop the runtime image build.
 COPY --from=check --chown=65532:65532 /app/dist ./dist
+COPY --chown=65532:65532 asyncapi.yaml ./asyncapi.yaml
 CMD ["dist/main.js"]

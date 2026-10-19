@@ -1,6 +1,7 @@
 import { trace } from "@opentelemetry/api";
 import pino from "pino";
 import { closeEvents, declaredSubscriptions, subscribe } from "./events.js";
+import { watchFlags } from "./flags.js";
 import { service } from "./platform.js";
 
 // A background worker: no web address. Every WORK_INTERVAL_MS (default half a minute) it buys
@@ -54,6 +55,12 @@ async function work(): Promise<void> {
     }
   });
 }
+
+// Feature flag overrides set from the console (src/flagstore.ts).
+watchFlags({
+  onChange: (flag, value) => logger.info({ flag, value: value ?? null }, value === undefined ? "flag override cleared" : "flag override set"),
+  onProblem: (error) => logger.warn({ err: error }, "flag overrides"),
+});
 
 const timer = setInterval(() => void work(), intervalMs);
 void work();
