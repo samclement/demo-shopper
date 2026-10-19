@@ -25,11 +25,11 @@ export async function visitShop(): Promise<{ bought: string | null; status: numb
   const shop = service("demo-shop");
   const item = pick(ITEMS);
   const quantity = 1 + Math.floor(Math.random() * 3);
-  const bought = await shop.fetch("/buy", {
+  const bought = await shop.fetch("/api/buy", {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ item, quantity }),
   });
   await bought.arrayBuffer();
-  const looked = await shop.fetch("/");
+  const looked = await shop.fetch("/api/shop");
   await looked.arrayBuffer();
   return { bought: bought.ok ? `${quantity} ${item}` : null, status: bought.status };
 }

@@ -26,7 +26,7 @@ test("a visit buys a small quantity of something, then looks at the shop", async
   const visit = await visitShop();
   assert.equal(visit.status, 201);
   const [buy, look] = seen.slice(-2);
-  assert.deepEqual([buy.method, buy.url, look.method, look.url], ["POST", "/buy", "GET", "/"]);
+  assert.deepEqual([buy.method, buy.url, look.method, look.url], ["POST", "/api/buy", "GET", "/api/shop"]);
   const { item, quantity } = JSON.parse(buy.body);
   assert.ok(["tea", "coffee", "biscuits", "milk", "sugar"].includes(item));
   assert.ok(quantity >= 1 && quantity <= 3, "small on purpose: ten or more would notify the team");
